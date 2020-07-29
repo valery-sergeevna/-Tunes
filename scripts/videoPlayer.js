@@ -4,7 +4,11 @@ export const videoPlayerInit = () => {
     videoButtonStop = document.querySelector('.video-button__stop'),   
     videoTimePassed = document.querySelector('.video-time__passed'),  
     videoProgress  = document.querySelector('.video-progress'), 
-    videoTimeTotal = document.querySelector('.video-time__total');  
+    videoTimeTotal = document.querySelector('.video-time__total'),
+    videoFullScreen = document.querySelector('.video-fullscreen'),
+    videoVolume = document.querySelector('.video-volume'),
+    videoIconUp = document.querySelector('.video-icon__up'),
+    videoIconDown = document.querySelector('.video-icon__down');
     
     //изменить значение иконок паузы/плэя
     const toggleIcon = () => {
@@ -16,6 +20,24 @@ export const videoPlayerInit = () => {
             videoButtonPlay.classList.remove('fa-play');
         }
     };
+    //изменить иконки звук/отключить звук
+    const toggleVolumeIcon = () =>{
+        const iconClass = videoIconDown.classList.contains('fa-volume-down');
+        if(iconClass){
+            //отключить звук видео, ползунок на ноль
+            videoPlayer.muted = true;
+            videoVolume.value = 0;
+            videoIconDown.classList.add('fa-volume-off');
+            videoIconDown.classList.remove('fa-volume-down');
+        }else if(!iconClass){
+            //включить звук видео, ползунок вернуть в текущее состояние звука
+            videoPlayer.muted = false;
+            videoVolume.value = videoPlayer.volume * 100;
+            videoIconDown.classList.remove('fa-volume-off');
+            videoIconDown.classList.add('fa-volume-down');
+        }
+    };
+
     //запустить/ остановить видео
     const togglePlay = () => {
         if (videoPlayer.paused){
@@ -23,7 +45,6 @@ export const videoPlayerInit = () => {
         }else{
             videoPlayer.pause();
         }
-
     };
     //остановить видео
     const stopPlay = () =>{
@@ -70,4 +91,25 @@ export const videoPlayerInit = () => {
 
     //остановить видео
     videoButtonStop.addEventListener('click', stopPlay);
+    videoFullScreen.addEventListener('click', () => {
+        videoPlayer.webkitEnterFullScreen();
+    });
+
+    //регулировать звук видео
+    videoVolume.addEventListener("input", () => {
+        videoPlayer.volume = videoVolume.value / 100;
+    });
+
+    //начально положение ползунка звука
+    videoVolume.value = videoPlayer.volume * 100;
+    
+    //изменить иконку звука
+    videoIconDown.addEventListener('click', toggleVolumeIcon);
+
+    //сделать звук максимальным при нажатии кнопки(иконки)
+    videoIconUp.addEventListener('click', () => {
+        videoPlayer.volume = 1;
+        videoVolume.value = videoPlayer.volume * 100;
+    });
+
 };
