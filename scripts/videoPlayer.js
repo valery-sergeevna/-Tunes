@@ -1,3 +1,5 @@
+import { addZero } from './supScripts.js';
+
 export const videoPlayerInit = () => {
     const videoPlayer = document.querySelector('.video-player'),
     videoButtonPlay = document.querySelector('.video-button__play'),   
@@ -7,7 +9,6 @@ export const videoPlayerInit = () => {
     videoTimeTotal = document.querySelector('.video-time__total'),
     videoFullScreen = document.querySelector('.video-fullscreen'),
     videoVolume = document.querySelector('.video-volume'),
-    videoIconUp = document.querySelector('.video-icon__up'),
     videoIconDown = document.querySelector('.video-icon__down');
     
     //изменить значение иконок паузы/плэя
@@ -20,19 +21,22 @@ export const videoPlayerInit = () => {
             videoButtonPlay.classList.remove('fa-play');
         }
     };
-    //изменить иконки звук/отключить звук
-    const toggleVolumeIcon = () =>{
-        const iconClass = videoIconDown.classList.contains('fa-volume-down');
-        if(iconClass){
-            //отключить звук видео, ползунок на ноль
-            videoPlayer.muted = true;
-            videoVolume.value = 0;
-            videoIconDown.classList.add('fa-volume-off');
-            videoIconDown.classList.remove('fa-volume-down');
-        }else if(!iconClass){
-            //включить звук видео, ползунок вернуть в текущее состояние звука
+
+    const toggleVolumePlay = () => {
+        if(videoPlayer.muted){
             videoPlayer.muted = false;
             videoVolume.value = videoPlayer.volume * 100;
+        } else {
+            videoPlayer.muted = true;
+            videoVolume.value = 0;
+        }
+    };
+    //изменить иконки звук/отключить звук
+    const toggleVolumeIcon = () =>{
+        if (videoVolume.value == 0){
+            videoIconDown.classList.add('fa-volume-off');
+            videoIconDown.classList.remove('fa-volume-down');
+        } else{
             videoIconDown.classList.remove('fa-volume-off');
             videoIconDown.classList.add('fa-volume-down');
         }
@@ -52,8 +56,6 @@ export const videoPlayerInit = () => {
         videoPlayer.currentTime = 0;
         
     };
-    //добавление 0 в начало минут
-    const addZero = n => n < 10 ? '0' + n : n;
     
     //остановить/запустить видео
     videoPlayer.addEventListener('click', togglePlay);
@@ -98,18 +100,22 @@ export const videoPlayerInit = () => {
     //регулировать звук видео
     videoVolume.addEventListener("input", () => {
         videoPlayer.volume = videoVolume.value / 100;
+        toggleVolumeIcon();
     });
 
     //начально положение ползунка звука
     videoVolume.value = videoPlayer.volume * 100;
     
     //изменить иконку звука
-    videoIconDown.addEventListener('click', toggleVolumeIcon);
-
-    //сделать звук максимальным при нажатии кнопки(иконки)
-    videoIconUp.addEventListener('click', () => {
-        videoPlayer.volume = 1;
-        videoVolume.value = videoPlayer.volume * 100;
+    videoIconDown.addEventListener('click', () => {
+        toggleVolumePlay();
+        toggleVolumeIcon();
     });
+
+    videoPlayerInit.stop = () => {
+        if(!videoPlayer.paused){
+            stopPlay();
+        }
+    };
 
 };
